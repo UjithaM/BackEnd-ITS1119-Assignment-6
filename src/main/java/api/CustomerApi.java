@@ -21,17 +21,12 @@ public class CustomerApi extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         var writer = resp.getWriter();
+        var dbProcess = new DBProcess();
         if(req.getContentType() == null ||
                 !req.getContentType().toLowerCase().startsWith("application/json")){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }else {
-            Jsonb jsonb = JsonbBuilder.create();
-            var customerDTO = jsonb.fromJson(req.getReader(), CustomerDTO.class);
-            Customer customer = new Customer();
-            customer.setFullName(customerDTO.getFullName());
-            customer.setAddress(customerDTO.getAddress());
-            var dbProcess = new DBProcess();
-            writer.println(dbProcess.saveCustomerData(customer));
+            writer.println(dbProcess.saveCustomerData(getCustomerData(req)));
         }
     }
 
@@ -68,5 +63,26 @@ public class CustomerApi extends HttpServlet {
             resp.setCharacterEncoding("UTF-8");
             resp.getWriter().write(json);
         }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        var writer = resp.getWriter();
+        String id = req.getParameter("customerId");
+        var dbProcess = new DBProcess();
+        if(id == null){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }else {
+            writer.println(dbProcess.updateCustomerData(id, getCustomerData(req)));
+        }
+    }
+
+    private Customer getCustomerData(HttpServletRequest req) throws IOException {
+        Jsonb jsonb = JsonbBuilder.create();
+        var customerDTO = jsonb.fromJson(req.getReader(), CustomerDTO.class);
+        Customer customer = new Customer();
+        customer.setFullName(customerDTO.getFullName());
+        customer.setAddress(customerDTO.getAddress());;
+        return customer;
     }
 }

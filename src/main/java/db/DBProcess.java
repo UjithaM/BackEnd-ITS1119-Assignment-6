@@ -36,6 +36,17 @@ public class DBProcess {
             throw new RuntimeException(e);
         }
     }
+    public String updateCustomerData(String customerId, Customer customer) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            customer.setCustomerId(customerId);
+            session.merge(customer);
+            transaction.commit();
+            return "Data Updated";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public Customer getCustomerData(String customerId) {
         try (Session session = sessionFactory.openSession()) {
