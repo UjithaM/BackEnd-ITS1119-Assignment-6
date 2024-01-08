@@ -61,4 +61,21 @@ public class DBProcess {
         int count = customers.size() + 1;
         return "CUST" + count;
     }
+
+    public String deleteCustomerData(String customerId) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            Customer customer = session.get(Customer.class, customerId);
+            if (customer != null) {
+                session.remove(customer);
+                transaction.commit();
+                return "Data Deleted!";
+            } else {
+                return "Customer not found!";
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

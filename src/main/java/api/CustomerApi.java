@@ -85,4 +85,16 @@ public class CustomerApi extends HttpServlet {
         customer.setAddress(customerDTO.getAddress());;
         return customer;
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String id = req.getParameter("customerId");
+        var writer = resp.getWriter();
+        var dbProcess = new DBProcess();
+        if(id == null){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }else {
+            writer.println(dbProcess.deleteCustomerData(id));
+        }
+    }
 }
