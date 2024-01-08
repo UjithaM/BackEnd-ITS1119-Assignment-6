@@ -116,4 +116,16 @@ public class DBProcess {
         }
     }
 
+    public String updateItemData(String itemId, Item item) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            item.setItemId(itemId);
+            session.merge(item);
+            transaction.commit();
+            return "Data Updated";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
