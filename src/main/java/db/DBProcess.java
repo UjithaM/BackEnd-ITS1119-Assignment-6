@@ -11,7 +11,7 @@ import java.util.List;
 
 public class DBProcess {
     private static final String GET_ALL_CUSTOMER = "FROM Customer";
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     public DBProcess() {
         this.sessionFactory = new Configuration().configure().buildSessionFactory();
@@ -28,6 +28,23 @@ public class DBProcess {
             throw new RuntimeException(e);
         }
     }
+
+    public List<Customer> getAllCustomerData() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery(GET_ALL_CUSTOMER, Customer.class).list();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Customer getCustomerData(String customerId) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.get(Customer.class, customerId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private String generateCustomerId(Session session) {
         List<Customer> customers = session.createQuery(GET_ALL_CUSTOMER, Customer.class).list();
         int count = customers.size() + 1;
