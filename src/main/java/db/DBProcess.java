@@ -128,4 +128,19 @@ public class DBProcess {
         }
     }
 
+    public String deleteItemData(String code) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            Item item = session.get(Item.class, code);
+            if (item != null) {
+                session.remove(item);
+                transaction.commit();
+                return "Data Deleted!";
+            } else {
+                return "Item not found!";
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

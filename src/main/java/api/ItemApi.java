@@ -99,4 +99,16 @@ public class ItemApi extends HttpServlet {
         item.setQty(customerDTO.getQty());
         return item;
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String id = req.getParameter("itemId");
+        var writer = resp.getWriter();
+        var dbProcess = new DBProcess();
+        if(id == null){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }else {
+            writer.println(dbProcess.deleteItemData(id));
+        }
+    }
 }
