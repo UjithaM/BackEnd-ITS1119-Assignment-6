@@ -1,6 +1,8 @@
 package api;
 
 import DTO.ItemDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import db.DBProcess;
 import entity.Item;
 import jakarta.json.bind.Jsonb;
@@ -31,5 +33,47 @@ public class ItemApi extends HttpServlet {
             var dbProcess = new DBProcess();
             writer.println(dbProcess.saveItemOne(item));
         }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        var writer = resp.getWriter();
+        String itemId = req.getParameter("itemId");
+        var dbProcess = new DBProcess();
+        if(itemId == null){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }else if(itemId.equals("all")){
+            String json = getString(dbProcess);
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().write(json);
+        }else {
+            var Item = dbProcess.getItemData(itemId);
+            ItemDTO itemDTO = new ItemDTO();
+            itemDTO.setItemId(Item.getItemId());
+            itemDTO.setDescription(Item.getDescription());
+            itemDTO.setUnitPrice(Item.getUnitPrice());
+            itemDTO.setQty(Item.getQty());
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(itemDTO);
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().write(json);
+        }
+    }
+
+    private static String getString(DBProcess data) throws JsonProcessingException {
+        var getAllId = data.getAllItemData();
+        for (Item item : getAllId){
+            ItemDTO itemDTO = new ItemDTO();
+            itemDTO.setItemId(item.getItemId());
+            itemDTO.setDescription(item.getDescription());
+            itemDTO.setUnitPrice(item.getUnitPrice());
+            itemDTO.setQty(item.getQty());
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(getAllId);
     }
 }

@@ -93,10 +93,27 @@ public class DBProcess {
             throw new RuntimeException(e);
         }
     }
+
+    public List<Item> getAllItemData() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery(GET_ALL_ITEM_DATA, Item.class).list();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private String generateItemId(Session session) {
         List<Item> items = session.createQuery(GET_ALL_ITEM_DATA, Item.class).list();
         int count = items.size() + 1;
         return "ITEM" + count;
+    }
+
+    public Item getItemData(String itemCode) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.get(Item.class, itemCode);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
