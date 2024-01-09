@@ -241,4 +241,19 @@ public class DBProcess {
     }
 
 
+    public String deleteOrderData(String id) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            Orders orders = session.get(Orders.class, id);
+            if (orders != null) {
+                session.remove(orders);
+                transaction.commit();
+                return "Data Deleted!";
+            } else {
+                return "Order not found!";
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

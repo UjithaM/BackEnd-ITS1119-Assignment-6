@@ -118,4 +118,16 @@ public class OrderApi extends HttpServlet {
         orders.setOrderItems(orderDTO.getOrderItems());
         return orders;
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String id = req.getParameter("orderId");
+        var writer = resp.getWriter();
+        var dbProcess = new DBProcess();
+        if(id == null){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }else {
+            writer.println(dbProcess.deleteOrderData(id));
+        }
+    }
 }
