@@ -2,10 +2,13 @@ package db;
 
 import entity.Customer;
 import entity.Item;
+import entity.OrderItem;
+import entity.Orders;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Order;
 
 import java.util.List;
 
@@ -13,6 +16,7 @@ public class DBProcess {
     private static final String GET_ALL_CUSTOMER = "FROM Customer";
 
     private static final String GET_ALL_ITEM_DATA = "FROM Item";
+    private static final String GET_ALL_ORDER_DARA = "FROM Orders";
     private final SessionFactory sessionFactory;
 
     public DBProcess() {
@@ -142,5 +146,44 @@ public class DBProcess {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    //Order process
+
+    public String saveOrder(Orders orders, List<OrderItem> orderItems) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+
+            try {
+                // Generate and set order ID
+                orders.setOrderId(generateOrderId(session));
+
+                // Save the Order entity
+                session.persist(orders);
+
+                // Set the Orders reference in each OrderItem and save them
+                for (OrderItem orderItem : orderItems) {
+                    orderItem.setOrders(orders);
+                    session.persist(orderItem);
+                }
+
+                // Commit the transaction
+                transaction.commit();
+
+                return "Data Saved!";
+            } catch (Exception e) {
+                // Rollback the transaction in case of an exception
+                transaction.rollback();
+                throw new RuntimeException(e);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String generateOrderId(Session session) {
+        List<Orders> items = session.createQuery(GET_ALL_ORDER_DARA, Orders.class).list();
+        int count = items.size() + 1;
+        return "ORDER" + count;
     }
 }
