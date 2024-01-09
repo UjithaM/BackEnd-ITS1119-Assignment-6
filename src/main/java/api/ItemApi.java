@@ -1,11 +1,9 @@
 package api;
 
-import DTO.CustomerDTO;
 import DTO.ItemDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import db.DBProcess;
-import entity.Customer;
 import entity.Item;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
@@ -92,11 +90,11 @@ public class ItemApi extends HttpServlet {
     }
     private Item getItemData(HttpServletRequest req) throws IOException {
         Jsonb jsonb = JsonbBuilder.create();
-        var customerDTO = jsonb.fromJson(req.getReader(), ItemDTO.class);
+        var itemDTO = jsonb.fromJson(req.getReader(), ItemDTO.class);
         Item item = new Item();
-        item.setDescription(customerDTO.getDescription());
-        item.setUnitPrice(customerDTO.getUnitPrice());
-        item.setQty(customerDTO.getQty());
+        item.setDescription(itemDTO.getDescription());
+        item.setUnitPrice(itemDTO.getUnitPrice());
+        item.setQty(itemDTO.getQty());
         return item;
     }
 
