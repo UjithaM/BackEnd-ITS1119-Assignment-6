@@ -205,4 +205,40 @@ public class DBProcess {
         }
     }
 
+    public String updateOrderData(String id, Orders updatedOrderData) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+
+            Orders existingOrder = session.get(Orders.class, id);
+
+            if (existingOrder == null) {
+                throw new IllegalArgumentException("Order with id " + id + " not found");
+            }
+
+            existingOrder.setDate(updatedOrderData.getDate());
+            existingOrder.setCustomer(updatedOrderData.getCustomer());
+            existingOrder.setNetTotal(updatedOrderData.getNetTotal());
+            existingOrder.setDiscount(updatedOrderData.getDiscount());
+            existingOrder.setCash(updatedOrderData.getCash());
+            existingOrder.setSubTotal(updatedOrderData.getSubTotal());
+
+            for (OrderItem updatedOrderItem : updatedOrderData.getOrderItems()) {
+                updatedOrderItem.setOrders(existingOrder);
+                session.merge(updatedOrderItem);
+            }
+
+            existingOrder.getOrderItems().clear();
+
+            existingOrder.getOrderItems().addAll(updatedOrderData.getOrderItems());
+
+            session.merge(existingOrder);
+
+            transaction.commit();
+            return "Data Updated";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
