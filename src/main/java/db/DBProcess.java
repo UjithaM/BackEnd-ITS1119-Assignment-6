@@ -4,6 +4,7 @@ import entity.Customer;
 import entity.Item;
 import entity.OrderItem;
 import entity.Orders;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -16,7 +17,8 @@ public class DBProcess {
     private static final String GET_ALL_CUSTOMER = "FROM Customer";
 
     private static final String GET_ALL_ITEM_DATA = "FROM Item";
-    private static final String GET_ALL_ORDER_DARA = "FROM Orders";
+    
+    private static final String GET_ALL_ORDER_DATA = "FROM Orders";
     private final SessionFactory sessionFactory;
 
     public DBProcess() {
@@ -155,24 +157,19 @@ public class DBProcess {
             Transaction transaction = session.beginTransaction();
 
             try {
-                // Generate and set order ID
                 orders.setOrderId(generateOrderId(session));
 
-                // Save the Order entity
                 session.persist(orders);
 
-                // Set the Orders reference in each OrderItem and save them
                 for (OrderItem orderItem : orderItems) {
                     orderItem.setOrders(orders);
                     session.persist(orderItem);
                 }
 
-                // Commit the transaction
                 transaction.commit();
 
                 return "Data Saved!";
             } catch (Exception e) {
-                // Rollback the transaction in case of an exception
                 transaction.rollback();
                 throw new RuntimeException(e);
             }
@@ -182,8 +179,30 @@ public class DBProcess {
     }
 
     private String generateOrderId(Session session) {
-        List<Orders> items = session.createQuery(GET_ALL_ORDER_DARA, Orders.class).list();
+        List<Orders> items = session.createQuery(GET_ALL_ORDER_DATA, Orders.class).list();
         int count = items.size() + 1;
         return "ORDER" + count;
     }
+
+    public List<Orders> getAllOrderData() {
+        try (Session session = sessionFactory.openSession()) {
+            List<Orders> orders = session.createQuery(GET_ALL_ORDER_DATA, Orders.class).list();
+            for (Orders order : orders) {
+                Hibernate.initialize(order.getOrderItems());
+            }
+            return  orders;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public Orders getOrderData(String orderId) {
+        try (Session session = sessionFactory.openSession()) {
+            Orders orders = session.get(Orders.class, orderId);
+            Hibernate.initialize(orders.getOrderItems());
+            return orders;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

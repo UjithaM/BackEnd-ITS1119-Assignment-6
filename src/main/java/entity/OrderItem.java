@@ -1,5 +1,6 @@
 package entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,7 @@ public class OrderItem {
     @Id
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "orderId")
+    @JsonBackReference
     private Orders orders;
 
     @Id
