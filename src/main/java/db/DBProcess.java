@@ -28,7 +28,6 @@ public class DBProcess {
     public String saveCustomerData(Customer customer) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            customer.setCustomerId(generateCustomerId(session));
             session.persist(customer);
             transaction.commit();
             return "Data saved";
@@ -64,11 +63,6 @@ public class DBProcess {
         }
     }
 
-    private String generateCustomerId(Session session) {
-        List<Customer> customers = session.createQuery(GET_ALL_CUSTOMER, Customer.class).list();
-        int count = customers.size() + 1;
-        return "CUST" + count;
-    }
 
     public String deleteCustomerData(String customerId) {
         try (Session session = sessionFactory.openSession()) {

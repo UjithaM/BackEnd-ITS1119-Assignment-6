@@ -81,6 +81,7 @@ public class CustomerApi extends HttpServlet {
         Jsonb jsonb = JsonbBuilder.create();
         var customerDTO = jsonb.fromJson(req.getReader(), CustomerDTO.class);
         Customer customer = new Customer();
+        customer.setCustomerId(customerDTO.getCustomerId());
         customer.setFullName(customerDTO.getFullName());
         customer.setAddress(customerDTO.getAddress());;
         return customer;
